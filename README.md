@@ -224,4 +224,4 @@ All seven tests passed in the development environment.
 
 ## Author
 
-Developed as a computer vision portfolio project to explore object detection, multi-object tracking, and reproducible model evaluation.
+Developed as a computer vision project to explore object detection, multi-object tracking, and reproducible model evaluation.

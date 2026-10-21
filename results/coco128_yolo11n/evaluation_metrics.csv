@@ -1,0 +1,2 @@
+model,dataset,split,image_size,batch_size,device,confidence_threshold,precision,recall,mAP50,mAP50_95,inference_time_ms_per_image,approx_inference_fps,note
+yolo11n.pt,coco128.yaml,val,640,4,cpu,0.001,0.643581368272806,0.6147701198386964,0.6716582004339092,0.5027547640586651,67.23875000000135,14.872376419846889,Inference FPS is estimated from model inference timing only. It is not end-to-end video processing FPS. Interpret metrics in the context of the dataset size and evaluation split.

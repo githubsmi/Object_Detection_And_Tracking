@@ -1,0 +1,16 @@
+{
+    "model": "yolo11n.pt",
+    "dataset": "coco128.yaml",
+    "split": "val",
+    "image_size": 640,
+    "batch_size": 4,
+    "device": "cpu",
+    "confidence_threshold": 0.001,
+    "precision": 0.643581368272806,
+    "recall": 0.6147701198386964,
+    "mAP50": 0.6716582004339092,
+    "mAP50_95": 0.5027547640586651,
+    "inference_time_ms_per_image": 67.23875000000135,
+    "approx_inference_fps": 14.872376419846889,
+    "note": "Inference FPS is estimated from model inference timing only. It is not end-to-end video processing FPS. Interpret metrics in the context of the dataset size and evaluation split."
+}

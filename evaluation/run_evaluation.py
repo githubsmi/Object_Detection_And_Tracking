@@ -1,4 +1,5 @@
 
+import argparse
 import csv
 import json
 from pathlib import Path
@@ -7,39 +8,57 @@ from ultralytics import YOLO
 
 
 MODEL_PATH = "yolo11n.pt"
-DATASET = "coco8.yaml"
 IMAGE_SIZE = 640
 BATCH_SIZE = 4
 CONFIDENCE = 0.001
+DEVICE = "cpu"
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Evaluate YOLO11 object detection."
+    )
+    parser.add_argument(
+        "--dataset",
+        choices=["coco8", "coco128"],
+        default="coco8",
+        help="Dataset to evaluate (default: coco8).",
+    )
+    return parser.parse_args()
 
 
 def main():
+    args = parse_args()
+
+    dataset_name = args.dataset
+    dataset_yaml = f"{dataset_name}.yaml"
+    run_name = f"{dataset_name}_yolo11n"
+
     print("=" * 55)
     print("YOLO11 OBJECT DETECTION EVALUATION")
     print("=" * 55)
-
     print(f"Model: {MODEL_PATH}")
-    print(f"Dataset: {DATASET}")
+    print(f"Dataset: {dataset_yaml}")
     print(f"Image size: {IMAGE_SIZE}")
     print(f"Batch size: {BATCH_SIZE}")
-    print("Device: CPU")
+    print(f"Device: {DEVICE}")
     print("\nLoading model...")
 
     model = YOLO(MODEL_PATH)
 
     print("Starting validation.")
-    print("The first run may download the COCO8 dataset.")
+    print(f"The dataset may be downloaded on the first run: {dataset_yaml}")
 
     metrics = model.val(
-        data=DATASET,
+        data=dataset_yaml,
         split="val",
         imgsz=IMAGE_SIZE,
         batch=BATCH_SIZE,
         conf=CONFIDENCE,
-        device="cpu",
+        device=DEVICE,
         plots=True,
         project=str(Path("results").resolve()),
-        name="coco8_yolo11n",
+        name=run_name,
         exist_ok=True,
         verbose=True,
     )
@@ -49,14 +68,9 @@ def main():
     map50 = float(metrics.box.map50)
     map50_95 = float(metrics.box.map)
 
-    inference_ms = float(
-        metrics.speed.get("inference", 0.0)
-    )
-
+    inference_ms = float(metrics.speed.get("inference", 0.0))
     inference_fps = (
-        1000.0 / inference_ms
-        if inference_ms > 0
-        else None
+        1000.0 / inference_ms if inference_ms > 0 else None
     )
 
     results_dir = Path(metrics.save_dir)
@@ -64,11 +78,11 @@ def main():
 
     report = {
         "model": MODEL_PATH,
-        "dataset": DATASET,
+        "dataset": dataset_yaml,
         "split": "val",
         "image_size": IMAGE_SIZE,
         "batch_size": BATCH_SIZE,
-        "device": "cpu",
+        "device": DEVICE,
         "confidence_threshold": CONFIDENCE,
         "precision": precision,
         "recall": recall,
@@ -77,9 +91,10 @@ def main():
         "inference_time_ms_per_image": inference_ms,
         "approx_inference_fps": inference_fps,
         "note": (
-            "Inference FPS is estimated from the model's "
-            "inference timing only. It is not end-to-end "
-            "video processing FPS."
+            "Inference FPS is estimated from model inference timing "
+            "only. It is not end-to-end video processing FPS. "
+            "Interpret metrics in the context of the dataset size "
+            "and evaluation split."
         ),
     }
 
@@ -92,9 +107,7 @@ def main():
     with csv_path.open(
         "w", newline="", encoding="utf-8"
     ) as file:
-        writer = csv.DictWriter(
-            file, fieldnames=report.keys()
-        )
+        writer = csv.DictWriter(file, fieldnames=report.keys())
         writer.writeheader()
         writer.writerow(report)
 

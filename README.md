@@ -122,4 +122,4 @@ The application displays the annotated video in an OpenCV window. When video sav
 
 ## Author
 
-Developed as a computer vision project for practical learning and portfolio development.
+Developed as a computer vision project for practical learning.

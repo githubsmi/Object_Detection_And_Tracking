@@ -12,7 +12,6 @@ The application supports webcam input and pre-recorded videos, displays bounding
 - Bounding boxes, class labels, and tracking IDs
 - Configurable detection confidence threshold
 - Manual saving of annotated video output
-- Unique output filenames to help prevent accidental overwriting
 
 ## Technologies Used
 

@@ -1,0 +1,17 @@
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Downloaded model weights
+*.pt
+
+# Generated videos and local test footage
+output/
+videos/
+
+# Editor files
+.vscode/
+.idea/

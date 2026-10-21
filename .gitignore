@@ -8,6 +8,10 @@ __pycache__/
 # Downloaded model weights
 *.pt
 
+# Downloaded datasets and Ultralytics run artifacts
+datasets/
+runs/
+
 # Generated videos and local test footage
 output/
 videos/
@@ -15,3 +19,8 @@ videos/
 # Editor files
 .vscode/
 .idea/
+
+# Test and tool caches
+.pytest_cache/
+.coverage
+htmlcov/

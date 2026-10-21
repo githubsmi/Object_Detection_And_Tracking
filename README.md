@@ -32,14 +32,13 @@ Object_Detection_And_Tracking/
 ├── videos/        # Local input videos; not tracked by Git
 └── output/        # Generated videos; not tracked by Git
 ```
-
-The `videos/` directory is used for local input footage, while `output/` stores processed videos. These folders are excluded from version control by default.
+The videos/ and output/ directories are excluded from version control to avoid uploading large video files and generated outputs. These directories may not appear after cloning the repository, so create them locally when needed.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.12 recommended
+- Python 3.12.10 recommended
 - pip
 - An internet connection for the initial model download
 - A webcam or an MP4 video file

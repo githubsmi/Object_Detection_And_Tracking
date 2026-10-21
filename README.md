@@ -47,11 +47,9 @@ The `videos/` directory is used for local input footage, while `output/` stores 
 ### 1. Clone the Repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/githubsmi/Object_Detection_And_Tracking.git
 cd Object_Detection_And_Tracking
 ```
-
-Replace `YOUR_GITHUB_REPOSITORY_URL` with the HTTPS URL of this repository.
 
 ### 2. Create a Virtual Environment
 

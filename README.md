@@ -29,8 +29,8 @@ Object_Detection_And_Tracking/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
-├── videos/
-└── output/
+├── videos/        # Local input videos; not tracked by Git
+└── output/        # Generated videos; not tracked by Git
 ```
 
 The `videos/` directory is used for local input footage, while `output/` stores processed videos. These folders are excluded from version control by default.
@@ -99,8 +99,13 @@ Detection confidence can be adjusted to filter out lower-confidence predictions.
 Tracking IDs identify tracked objects within a video session; they do not establish a person's real-world identity.
 
 ## Output
+The application displays annotated frames in an OpenCV window.
+Press `S` to start saving the annotated video and `Q` to exit
+the application. Recording begins when `S` is pressed, so frames
+displayed before that point are not included in the saved file.
 
-The application displays the annotated video in an OpenCV window. When video saving is enabled through the application's manual save control, the processed footage can be stored in the `output/` directory.
+Saved videos are written to the `output/` directory. Output
+filenames are generated to avoid overwriting existing recordings.
 
 ## Limitations
 

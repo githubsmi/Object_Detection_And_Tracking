@@ -29,10 +29,11 @@ Object_Detection_And_Tracking/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
-├── videos/        # Local input videos; not tracked by Git
-└── output/        # Generated videos; not tracked by Git
+├── videos/    # Local input videos; not tracked by Git
+└── output/    # Generated annotated videos; not tracked by Git
 ```
-The videos/ and output/ directories are excluded from version control to avoid uploading large video files and generated outputs. These directories may not appear after cloning the repository, so create them locally when needed.
+
+The `videos/` and `output/` directories are excluded from version control to avoid uploading large video files and generated outputs. These directories may not appear after cloning the repository, so create them locally when needed.
 
 ## Getting Started
 

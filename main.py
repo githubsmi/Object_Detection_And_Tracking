@@ -1,7 +1,6 @@
 
 import argparse
 from pathlib import Path
-from datetime import datetime
 
 import cv2
 from ultralytics import YOLO
@@ -11,59 +10,110 @@ def get_unique_output_path(source_name):
     output_dir = Path("output")
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    base_name = Path(source_name).stem if not source_name.isdigit() else "webcam"
+    source_path = Path(source_name)
+    base_name = (
+        "webcam"
+        if source_name.isdigit()
+        else source_path.stem
+    )
 
     output_path = output_dir / f"{base_name}_tracked.mp4"
     counter = 1
 
     while output_path.exists():
-        output_path = output_dir / f"{base_name}_tracked_{counter}.mp4"
+        output_path = (
+            output_dir / f"{base_name}_tracked_{counter}.mp4"
+        )
         counter += 1
 
     return output_path
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--source", default="0")
-    parser.add_argument("--conf", type=float, default=0.50)
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Detect and track objects in video using YOLO11 and ByteTrack."
+    )
+
+    parser.add_argument(
+        "--source",
+        default="0",
+        help="Webcam index or video file path (default: 0).",
+    )
+
+    parser.add_argument(
+        "--conf",
+        type=float,
+        default=0.50,
+        help="Detection confidence threshold from 0 to 1 (default: 0.50).",
+    )
+
+    parser.add_argument(
+        "--model",
+        default="yolo11n.pt",
+        help="YOLO model weights (default: yolo11n.pt).",
+    )
+
+    parser.add_argument(
+        "--tracker",
+        default="bytetrack.yaml",
+        help="Ultralytics tracker configuration (default: bytetrack.yaml).",
+    )
+
     args = parser.parse_args()
 
-    source = int(args.source) if args.source.isdigit() else args.source
-    model = YOLO("yolo11n.pt")
+    if not 0.0 <= args.conf <= 1.0:
+        parser.error("--conf must be between 0 and 1.")
 
+    return args
+
+
+def main():
+    args = parse_args()
+
+    source = (
+        int(args.source)
+        if args.source.isdigit()
+        else args.source
+    )
+
+    model = YOLO(args.model)
     cap = cv2.VideoCapture(source)
 
     if not cap.isOpened():
-        raise RuntimeError(f"Cannot open video source: {args.source}")
+        cap.release()
+        raise RuntimeError(
+            f"Cannot open video source: {args.source}. "
+            "Check the webcam index or video file path."
+        )
 
     writer = None
-    saved = False
-    frame_count = 0
     output_path = None
+    saved = False
     window_name = "Object Detection and Tracking"
 
-    print("Press S to save the tracked video.")
+    print(f"Model: {args.model}")
+    print(f"Confidence threshold: {args.conf}")
+    print(f"Tracker: {args.tracker}")
+    print("Press S to start saving the annotated video.")
     print("Press Q to quit.")
 
     try:
         while True:
             success, frame = cap.read()
+
             if not success:
                 break
 
             results = model.track(
                 frame,
                 persist=True,
-                tracker="bytetrack.yaml",
+                tracker=args.tracker,
                 conf=args.conf,
-                verbose=False
+                verbose=False,
             )
 
             annotated = results[0].plot()
-            frame_count += 1
 
-            # Keep frames in memory until the user chooses to save.
             if writer is not None:
                 writer.write(annotated)
 
@@ -73,41 +123,48 @@ def main():
             if key == ord("s"):
                 if writer is None:
                     output_path = get_unique_output_path(args.source)
+
                     height, width = annotated.shape[:2]
                     fps = cap.get(cv2.CAP_PROP_FPS)
 
-                    if not fps or fps <= 0:
+                    if fps <= 0:
                         fps = 30.0
 
                     writer = cv2.VideoWriter(
                         str(output_path),
                         cv2.VideoWriter_fourcc(*"mp4v"),
                         fps,
-                        (width, height)
+                        (width, height),
                     )
 
                     if not writer.isOpened():
                         writer.release()
                         writer = None
-                        raise RuntimeError("Could not create output video.")
+                        raise RuntimeError(
+                            "Could not create output video. "
+                            "Check the output directory and video codec."
+                        )
 
+                    # Include the frame on which saving begins.
                     writer.write(annotated)
                     saved = True
-                    print(f"Recording saved to: {output_path.resolve()}")
+                    print(f"Saving video to: {output_path.resolve()}")
 
                 else:
-                    print("Saving is already enabled for this video.")
+                    print("Saving is already enabled.")
 
             if key == ord("q"):
                 break
 
     finally:
         cap.release()
+
         if writer is not None:
             writer.release()
+
         cv2.destroyAllWindows()
 
-    if saved:
+    if saved and output_path is not None:
         print(f"Saved video: {output_path.resolve()}")
     else:
         print("No video was saved.")
